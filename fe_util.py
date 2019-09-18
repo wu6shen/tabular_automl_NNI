@@ -16,6 +16,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
+import libaa
 import pandas as pd
 import numpy as np 
 from sklearn.model_selection import KFold
@@ -181,30 +182,11 @@ def crosscount(df, col_list):
     """
     tools for multy thread bi_count
     """
-    print(col_list)
     assert isinstance(col_list, list)
     assert len(col_list) >= 2
     name = "count_"+ '_'.join(col_list)
-    #df[name] = df.groupby(col_list)[col_list[0]].transform('count')
-    df[col_list] = df[col_list].fillna('aaaaaaa')
-    import libaa
-    print(type(df[col_list[0]].values[0]))
-    libaa.func(df[col_list[0]].values)
-    #lib.func(df[col_list[0]].values, len(df[col_list[0]]))
-    #df[name] = Groupby(df[col_list]).apply(len, df[col_list[0]], broadcast=False)
-    #df[name] = pd.DataFrame(Groupby(df[col_list]).apply(len, df[col_list[0]], broadcast=False))
-    #df.groupby(col_list)[col_list[0]].transform('count')
-    #df[name] = df.groupby(col_list)[col_list[0]].apply('count')
-    #print(df[col_list[0]].dtype)
-    #a = df[col_list[0]].values + df[col_list[1]].values
-    #np.savetxt('in',a,fmt='%s')
-    #start_time = time.time()
-    #_,r=np.unique(a, return_inverse=True)
-    #stop_time = time.time()
-    #print(stop_time-start_time)
-    #y = np.bincount(r)
-    #r = y[r]
-
+    df[name] = df.groupby(col_list)[col_list[0]].transform('count')
+    #df[name] = pd.DataFrame(libaa.compute_by_sort_no_merge(df[col_list].values))
     
     return df
 
@@ -218,8 +200,10 @@ def aggregate(df, num_col, col, stat_list = AGGREGATE_TYPE):
     #agg_result = df.groupby([col])[num_col].agg(agg_dict)
     #r = left_merge(df, agg_result, on = [col])
     #df = concat([df, r])
+    #print(col)
     tmp = df.groupby([col])[num_col]
     tmp = pd.concat({k: tmp.transform(v) for k, v in agg_dict.items()}).unstack(0)
+    #print(tmp)
     df = concat([df, tmp])
     return df
 
